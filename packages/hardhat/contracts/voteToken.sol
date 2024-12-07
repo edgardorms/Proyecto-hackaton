@@ -1,13 +1,19 @@
 // SPDX-License-Identifier: MIT
-// Compatible with OpenZeppelin Contracts ^5.0.0
-
 pragma solidity ^0.8.22;
 
-import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract MyToken is ERC721 {
-    constructor() ERC721("voteToken", "VTT") {
-
-        MyToken._owner=msg.sender;
+contract VoteToken is ERC721, Ownable {
+    constructor() ERC721("VoteToken", "VTT") Ownable(msg.sender) {}
+    
+    // Solo el owner (BuildingDAO) puede mintear tokens
+    function mint(address to, uint256 tokenId) external onlyOwner {
+        _safeMint(to, tokenId);
+    }
+    
+    // Solo el owner puede quemar tokens
+    function burn(uint256 tokenId) external onlyOwner {
+        _burn(tokenId);
     }
 }

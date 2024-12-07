@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "./BuildingDAO.sol";
 
 contract Vote {
 
-addres public parentDao;
-BuildingDao.ProposalType public proposal;
+address public parentDao;
+BuildingDAO.ProposalType public proposal;
 
 string public title;
 string public description;
