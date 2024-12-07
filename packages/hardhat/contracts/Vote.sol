@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 contract Vote {
 
 addres public parentDao;
-BuildingDao.ProposalType public proposaltype;
+BuildingDao.ProposalType public proposal;
 
 string public title;
 string public description;
@@ -37,7 +37,7 @@ constructor(
         uint256 _endTime,
         uint256 _quorum,
         uint256 _requiredMajority,
-        BuildingDAO.ProposalType _proposalType,
+        BuildingDAO.ProposalType _proposal,
         address _creator,
         address _parentDAO)
      {
@@ -47,7 +47,7 @@ constructor(
         endTime = _endTime;
         quorum = _quorum;
         requiredMajority = _requiredMajority;
-        proposalType = _proposalType;
+        proposal = _proposal;
         creator = _creator;
         parentDAO = _parentDAO;
     }
