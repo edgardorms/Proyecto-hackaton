@@ -50,6 +50,7 @@ contract Vote {
     function vote(bool inFavor) external {
         require(block.timestamp >= startTime, "Voting not started");
         require(block.timestamp <= endTime, "Voting ended");
+        
         require(!hasVoted[msg.sender], "Already voted");
 
         uint256 tokensOwned = BuildingDAO(parentDao).getOwnerTokens(msg.sender);

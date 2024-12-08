@@ -227,6 +227,12 @@ function getProposalDetails(uint256 _proposalId) public view returns (
         return ownPower;
     }
 
+    function sendVote(bool inFavor, address _proposalAddress) external {
+    // Verifica que la dirección de la propuesta no sea la dirección cero
+    require(_proposalAddress != address(0), "Proposal does not exist");
 
+    // Llama a la función 'vote' del contrato Vote correspondiente
+    Vote(_proposalAddress).vote(inFavor);
+    }
 
 }

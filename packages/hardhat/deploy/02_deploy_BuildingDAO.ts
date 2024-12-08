@@ -6,7 +6,7 @@ const deployBuildingDAO: DeployFunction = async function (hre: HardhatRuntimeEnv
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  const deployer2 ="0xdbB3Dbbff646c1F21A6c6e3C1a195021033dad6F";
+  //const deployer2 ="0xdbB3Dbbff646c1F21A6c6e3C1a195021033dad6F";
 
   console.log("\n-------------------------------------");
   console.log("🏗 Deploying BuildingDAO contract...");
