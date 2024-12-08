@@ -7,15 +7,9 @@ import { Address } from "~~/components/scaffold-eth";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 import { notification } from "~~/utils/scaffold-eth";
 
+//import {VoteABI} from "~~/packages/hardhat/artifacts/contracts/Vote.sol/Vote.json";
 // pages/page.tsx
 
-// pages/page.tsx
-
-// pages/page.tsx
-
-// pages/page.tsx
-
-// pages/page.tsx
 
 interface Proposal {
   voteContract: string;
@@ -29,9 +23,11 @@ interface Proposal {
 }
 
 const ProposalCard = ({ proposal, buildingDAOInfo }: { proposal: Proposal; buildingDAOInfo: any }) => {
-  const { writeContract, isSuccess, isError } = useWriteContract();
 
-  const handleVote = async (inFavor: boolean) => {
+const { writeContract, isSuccess, isError } = useWriteContract();
+
+
+const handleVote = async (inFavor: boolean) => {
     try {
       await writeContract({
         address: proposal.voteContract as `0x${string}`,
@@ -50,6 +46,10 @@ const ProposalCard = ({ proposal, buildingDAOInfo }: { proposal: Proposal; build
       notification.error("Error voting");
     }
   };
+
+
+
+
 
   return (
     <div className="bg-base-100 border-base-300 border shadow-md shadow-secondary rounded-3xl px-6 pt-4 pb-4 mb-4">

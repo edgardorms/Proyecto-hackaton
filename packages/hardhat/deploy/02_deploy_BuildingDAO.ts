@@ -6,6 +6,8 @@ const deployBuildingDAO: DeployFunction = async function (hre: HardhatRuntimeEnv
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
+  const deployer2 ="0xdbB3Dbbff646c1F21A6c6e3C1a195021033dad6F";
+
   console.log("\n-------------------------------------");
   console.log("🏗 Deploying BuildingDAO contract...");
   console.log("Deployer address:", deployer);
@@ -15,11 +17,14 @@ const deployBuildingDAO: DeployFunction = async function (hre: HardhatRuntimeEnv
   const totalApartments = 50;
 
   // Test addresses - using local network addresses
+  
   const initialOwners = [
+    
+    "0xdbB3Dbbff646c1F21A6c6e3C1a195021033dad6F",
     "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
     "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
     "0x0AD49e5E66B949424b25572FC99d94d8bf35f575",
-    "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+    "0x90F79bf6EB2c4f870365E785982E1f101E93b906"
   ];
 
   // Using deployer as treasury for testing
@@ -36,6 +41,7 @@ const deployBuildingDAO: DeployFunction = async function (hre: HardhatRuntimeEnv
     if (!ethers.isAddress(treasury)) {
       throw new Error(`Invalid treasury address: ${treasury}`);
     }
+
 
     // Deploy BuildingDAO
     const buildingDAO = await deploy("BuildingDAO", {

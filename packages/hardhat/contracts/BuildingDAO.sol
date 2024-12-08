@@ -226,4 +226,7 @@ function getProposalDetails(uint256 _proposalId) public view returns (
         
         return ownPower;
     }
+
+
+
 }
