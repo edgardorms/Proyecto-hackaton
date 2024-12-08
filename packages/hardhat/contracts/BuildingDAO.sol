@@ -72,7 +72,7 @@ contract BuildingDAO {
     string memory _title,
     string memory _description,
     ProposalType _type,
-    bytes memory _callData
+    bytes memory /* _callData */
 ) public onlyOwner returns (uint256) {
     // Basic validations
     require(bytes(_title).length > 0, "Title cannot be empty");
@@ -126,7 +126,68 @@ contract BuildingDAO {
         revert("Vote creation failed");
     }
 }
+// BuildingDAO.sol - Add these functions
 
+// Get Vote contract address by proposalId
+function getVoteContract(uint256 _proposalId) public view returns (address) {
+    return proposalVotes[_proposalId];
+}
+
+// Get number of proposals
+function getProposalCount() public view returns (uint256) {
+    return proposalCount;
+}
+
+// Get all active proposals
+function getActiveProposals() public view returns (address[] memory) {
+    address[] memory activeVotes = new address[](proposalCount);
+    uint256 activeCount = 0;
+    
+    for(uint256 i = 0; i < proposalCount; i++) {
+        address voteAddress = proposalVotes[i];
+        if(voteAddress != address(0)) {
+            Vote vote = Vote(voteAddress);
+            if(!vote.executed() && block.timestamp <= vote.endTime()) {
+                activeVotes[activeCount] = voteAddress;
+                activeCount++;
+            }
+        }
+    }
+    
+    // Resize array to actual count
+    assembly {
+        mstore(activeVotes, activeCount)
+    }
+    
+    return activeVotes;
+}
+
+// Get proposal details
+function getProposalDetails(uint256 _proposalId) public view returns (
+    address voteContract,
+    string memory title,
+    string memory description,
+    uint256 startTime,
+    uint256 endTime,
+    uint256 yesVotes,
+    uint256 noVotes,
+    bool executed
+) {
+    address voteAddress = proposalVotes[_proposalId];
+    require(voteAddress != address(0), "Proposal does not exist");
+    
+    Vote vote = Vote(voteAddress);
+    return (
+        voteAddress,
+        vote.title(),
+        vote.description(),
+        vote.startTime(),
+        vote.endTime(),
+        vote.yesVotes(),
+        vote.noVotes(),
+        vote.executed()
+    );
+}
     function getOwnerTokens(address _owner) external view returns (uint256) {
         return voteToken.balanceOf(_owner);
     }
