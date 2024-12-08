@@ -68,48 +68,64 @@ contract BuildingDAO {
         }
     }
 
-    function createProposal(
-        string memory _title,
-        string memory _description,
-        ProposalType _type,
-        bytes memory _callData
-    ) public onlyOwner returns (uint256) {
-        require(voteToken.balanceOf(msg.sender) > 0, "No tokens");
+ function createProposal(
+    string memory _title,
+    string memory _description,
+    ProposalType _type,
+    bytes memory _callData
+) public onlyOwner returns (uint256) {
+    // Basic validations
+    require(bytes(_title).length > 0, "Title cannot be empty");
+    require(bytes(_description).length > 0, "Description cannot be empty");
+    require(voteToken.balanceOf(msg.sender) > 0, "No tokens owned");
+    
+    // Time validations
+    uint256 startTime = block.timestamp + VOTING_DELAY;
+    require(startTime > block.timestamp, "Invalid start time");
+    
+    uint256 endTime = startTime + VOTING_PERIOD;
+    require(endTime > startTime, "Invalid end time");
 
-        uint256 startTime = block.timestamp + VOTING_DELAY;
-        uint256 endTime = startTime + VOTING_PERIOD;
-        uint256 quorum;
-        uint256 requiredMajority;
+    // Calculate quorum and majority
+    uint256 quorum;
+    uint256 requiredMajority;
 
-        if (_type == ProposalType.MINOR_CHANGE) {
-            quorum = (buildingInfo.totalApartments * 25) / 100;
-            requiredMajority = 50;
-        } else if (_type == ProposalType.MODERATE_CHANGE) {
-            quorum = (buildingInfo.totalApartments * 50) / 100;
-            requiredMajority = 60;
-        } else {
-            quorum = (buildingInfo.totalApartments * 75) / 100;
-            requiredMajority = 75;
-        }
+    if (_type == ProposalType.MINOR_CHANGE) {
+        quorum = (buildingInfo.totalApartments * 25) / 100;
+        requiredMajority = 50;
+    } else if (_type == ProposalType.MODERATE_CHANGE) {
+        quorum = (buildingInfo.totalApartments * 50) / 100;
+        requiredMajority = 60;
+    } else if (_type == ProposalType.MAJOR_CHANGE) {
+        quorum = (buildingInfo.totalApartments * 75) / 100;
+        requiredMajority = 75;
+    } else {
+        revert("Invalid proposal type");
+    }
 
-        Vote newVote = new Vote(
-            _title,
-            _description,
-            startTime,
-            endTime,
-            quorum,
-            requiredMajority,
-            _type,
-            msg.sender,
-            address(this)
-        );
-
+    // Create new vote contract with try/catch
+    try new Vote(
+        _title,
+        _description,
+        startTime,
+        endTime,
+        quorum,
+        requiredMajority,
+        _type,
+        msg.sender,
+        address(this)
+    ) returns (Vote newVote) {
         uint256 proposalId = proposalCount++;
         proposalVotes[proposalId] = address(newVote);
-
+        
         emit ProposalCreated(proposalId, address(newVote));
         return proposalId;
+    } catch Error(string memory reason) {
+        revert(string(abi.encodePacked("Vote creation failed: ", reason)));
+    } catch {
+        revert("Vote creation failed");
     }
+}
 
     function getOwnerTokens(address _owner) external view returns (uint256) {
         return voteToken.balanceOf(_owner);
