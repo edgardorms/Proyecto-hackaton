@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "./VoteToken.sol";
+import "./voteToken.sol";
 import "./Vote.sol";
 
 contract BuildingDAO {
