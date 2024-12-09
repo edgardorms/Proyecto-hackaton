@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     BuildingDAO: {
-      address: "0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE",
+      address: "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d",
       abi: [
         {
           inputs: [
@@ -90,6 +90,31 @@ const deployedContracts = {
             },
           ],
           name: "ProposalCreated",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "start",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "end",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "duration",
+              type: "uint256",
+            },
+          ],
+          name: "ProposalTiming",
           type: "event",
         },
         {
@@ -460,7 +485,7 @@ const deployedContracts = {
       inheritedFunctions: {},
     },
     Vote: {
-      address: "0x68B1D87F95878fE05B998F19b66F4baba5De1aed",
+      address: "0x59b670e9fA9D0A427751Af201D676719a970857b",
       abi: [
         {
           inputs: [
@@ -512,6 +537,25 @@ const deployedContracts = {
           ],
           stateMutability: "nonpayable",
           type: "constructor",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "string",
+              name: "message",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "value",
+              type: "uint256",
+            },
+          ],
+          name: "Debug",
+          type: "event",
         },
         {
           anonymous: false,
@@ -634,6 +678,34 @@ const deployedContracts = {
             {
               internalType: "bool",
               name: "_majorityReached",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getVotingStatus",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "currentTime",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "votingStart",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "votingEnd",
+              type: "uint256",
+            },
+            {
+              internalType: "bool",
+              name: "isActive",
               type: "bool",
             },
           ],

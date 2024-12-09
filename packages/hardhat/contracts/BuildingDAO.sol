@@ -34,6 +34,7 @@ contract BuildingDAO {
     event ProposalCreated(uint256 indexed proposalId, address voteContract);
     event OwnerAdded(address indexed owner, uint256 tokenId);
     event OwnerRemoved(address indexed owner, uint256 tokenId);
+    event ProposalTiming(uint256 start, uint256 end, uint256 duration);
 
     modifier onlyAdmin() {
         require(msg.sender == admin, "Solo admin");
@@ -80,11 +81,11 @@ contract BuildingDAO {
     require(voteToken.balanceOf(msg.sender) > 0, "No tokens owned");
     
     // Time validations
-    uint256 startTime = block.timestamp + VOTING_DELAY;
-    require(startTime > block.timestamp, "Invalid start time");
-    
+    uint256 startTime = block.timestamp;
     uint256 endTime = startTime + VOTING_PERIOD;
-    require(endTime > startTime, "Invalid end time");
+    emit ProposalTiming(startTime, endTime, VOTING_PERIOD);
+    require(startTime < endTime, "Invalid voting period");
+    require(endTime > block.timestamp, "End time must be in future");
 
     // Calculate quorum and majority
     uint256 quorum;

@@ -24,6 +24,7 @@ contract Vote {
 
     event Voted(address indexed voter, bool inFavor);
     event ProposalExecuted();
+    event Debug(string message, uint256 value); // Add debug event
 
     constructor(
         string memory _title,
@@ -48,9 +49,17 @@ contract Vote {
     }
 
     function vote(bool inFavor) external {
-        // require(block.timestamp >= startTime, "Voting not started");
-        // require(block.timestamp <= endTime, "Voting ended");
-        
+        // Add debug events
+        emit Debug("Current time", block.timestamp);
+        emit Debug("Start time", startTime);
+        emit Debug("End time", endTime);
+
+        // Check if voting period is valid
+        require(startTime < endTime, "Invalid voting period");
+
+        // Check if voting is active
+        require(block.timestamp >= startTime, "Voting not started");
+        require(block.timestamp <= endTime, "Voting ended");
         require(!hasVoted[msg.sender], "Already voted");
 
         uint256 tokensOwned = BuildingDAO(parentDao).getOwnerTokens(msg.sender);
@@ -103,6 +112,21 @@ contract Vote {
             block.timestamp > endTime,
             totalVotes >= quorum,
             yesPercentage >= requiredMajority
+        );
+    }
+
+    // Add helper function to check voting status
+    function getVotingStatus() public view returns (
+        uint256 currentTime,
+        uint256 votingStart,
+        uint256 votingEnd,
+        bool isActive
+    ) {
+        return (
+            block.timestamp,
+            startTime,
+            endTime,
+            (block.timestamp >= startTime && block.timestamp <= endTime)
         );
     }
 }
