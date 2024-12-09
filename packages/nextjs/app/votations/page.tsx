@@ -19,6 +19,10 @@ import { notification } from "~~/utils/scaffold-eth";
 
 // pages/page.tsx
 
+// pages/page.tsx
+
+// pages/page.tsx
+
 const hasAddressVotedAbi = [
   {
     inputs: [{ internalType: "address", name: "_voter", type: "address" }],
