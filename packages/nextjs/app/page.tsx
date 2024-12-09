@@ -2,18 +2,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { createPublicClient, getContract, http } from "viem";
+import { hardhat } from "viem/chains";
 import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import { Address } from "~~/components/scaffold-eth";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 import { notification } from "~~/utils/scaffold-eth";
-
-// pages/page.tsx
-
-// pages/page.tsx
-
-// pages/page.tsx
-
-// pages/page.tsx
 
 // pages/page.tsx
 
@@ -57,20 +51,23 @@ interface Proposal {
 }
 
 const ProposalCard = ({ proposal, buildingDAOInfo }: { proposal: Proposal; buildingDAOInfo: any }) => {
-  // Update to use the same pattern as other contract reads
   const { address } = useAccount();
   const { data: hasVoted } = useReadContract({
     address: proposal.voteContract as `0x${string}`,
     abi: hasAddressVotedAbi,
     functionName: "hasAddressVoted",
     args: [address as `0x${string}`],
+    query: {
+      refetchInterval: 2000, // Refresca cada 2 segundos
+    },
   });
-  console.log(hasVoted);
 
   const totalVotes = proposal.yesVotes + proposal.noVotes;
 
-  const { writeContract, isSuccess, isError, isPending, error } = useWriteContract();
+  const { writeContract } = useWriteContract();
   const [isLoading, setIsLoading] = useState(false);
+  const [txHash, setTxHash] = useState<string>();
+
   const handleVote = async (inFavor: boolean) => {
     try {
       setIsLoading(true);
@@ -111,21 +108,12 @@ const ProposalCard = ({ proposal, buildingDAOInfo }: { proposal: Proposal; build
       });
 
       console.log("Transaction submitted:", tx);
-
-      if (isSuccess) {
-        notification.success("Vote submitted successfully");
-      }
-      if (isError) {
-        console.error("Vote error:", error);
-        notification.error(`Failed to submit vote: ${error?.message || "Unknown error"}`);
-      }
     } catch (error: any) {
       console.error("Vote execution error:", {
         message: error.message,
         error: error,
       });
       notification.error(`Error voting: ${error.message}`);
-    } finally {
       setIsLoading(false);
     }
   };
@@ -136,6 +124,9 @@ const ProposalCard = ({ proposal, buildingDAOInfo }: { proposal: Proposal; build
     address: proposal.voteContract as `0x${string}`,
     abi: voteStatisticsAbi,
     functionName: "getVoteStatistics",
+    query: {
+      refetchInterval: 2000, // Refresca cada 2 segundos
+    },
   });
 
   // Update countdown timer
@@ -170,7 +161,7 @@ const ProposalCard = ({ proposal, buildingDAOInfo }: { proposal: Proposal; build
       ) : (
         <div className="flex gap-4 mt-4">
           <button onClick={() => handleVote(true)} disabled={isLoading} className="btn btn-success">
-            Vote Yes
+            {isLoading ? "Voting..." : "Vote Yes"}
           </button>
           <button onClick={() => handleVote(false)} disabled={isLoading} className="btn btn-error">
             Vote No
@@ -226,53 +217,94 @@ export default function Home() {
     address: buildingDAOInfo?.address as `0x${string}`,
     abi: buildingDAOInfo?.abi,
     functionName: "getProposalCount",
-    //  watch: true,
+    query: {
+      refetchInterval: 2000,
+    },
   });
 
-  // Create fixed number of hooks (e.g., max 10 proposals)
-  const proposal0 = useReadContract({
+  // Create a single request for all proposals
+  const { data: allProposals } = useReadContract({
     address: buildingDAOInfo?.address as `0x${string}`,
-    abi: buildingDAOInfo?.abi,
-    functionName: "getProposalDetails",
-    args: [0n],
-    //enabled: Boolean(proposalCount && Number(proposalCount) > 0),
+    abi: [
+      {
+        inputs: [],
+        name: "getActiveProposals",
+        outputs: [{ type: "address[]", name: "" }],
+        stateMutability: "view",
+        type: "function",
+      },
+    ],
+    functionName: "getActiveProposals",
+    query: {
+      refetchInterval: 2000,
+    },
   });
-
-  const proposal1 = useReadContract({
-    address: buildingDAOInfo?.address as `0x${string}`,
-    abi: buildingDAOInfo?.abi,
-    functionName: "getProposalDetails",
-    args: [1n],
-    // enabled: Boolean(proposalCount && Number(proposalCount) > 1),
-  });
-
-  // Add more as needed...
 
   // Combine results
   useEffect(() => {
-    if (!proposalCount) return;
+    if (!allProposals) return;
 
-    const proposalResults = [proposal0.data, proposal1.data].slice(0, Number(proposalCount)).filter(Boolean);
+    const fetchProposalDetails = async () => {
+      const publicClient = createPublicClient({
+        chain: hardhat,
+        transport: http(),
+      });
 
-    type ProposalResult = readonly [string, string, string, bigint, bigint, bigint, bigint, boolean];
+      const proposalPromises = allProposals.map(async voteContract => {
+        const contract = getContract({
+          address: voteContract,
+          abi: [
+            { inputs: [], name: "title", outputs: [{ type: "string" }], stateMutability: "view", type: "function" },
+            {
+              inputs: [],
+              name: "description",
+              outputs: [{ type: "string" }],
+              stateMutability: "view",
+              type: "function",
+            },
+            {
+              inputs: [],
+              name: "startTime",
+              outputs: [{ type: "uint256" }],
+              stateMutability: "view",
+              type: "function",
+            },
+            { inputs: [], name: "endTime", outputs: [{ type: "uint256" }], stateMutability: "view", type: "function" },
+            { inputs: [], name: "yesVotes", outputs: [{ type: "uint256" }], stateMutability: "view", type: "function" },
+            { inputs: [], name: "noVotes", outputs: [{ type: "uint256" }], stateMutability: "view", type: "function" },
+            { inputs: [], name: "executed", outputs: [{ type: "bool" }], stateMutability: "view", type: "function" },
+          ],
+          client: publicClient,
+        });
 
-    const validProposals = proposalResults
-      .filter((result): result is ProposalResult => !!result)
-      .map(
-        (result: ProposalResult): Proposal => ({
-          voteContract: result[0],
-          title: result[1],
-          description: result[2],
-          startTime: Number(result[3]),
-          endTime: Number(result[4]),
-          yesVotes: Number(result[5]),
-          noVotes: Number(result[6]),
-          executed: result[7],
-        }),
-      );
+        const [title, description, startTime, endTime, yesVotes, noVotes, executed] = await Promise.all([
+          contract.read.title(),
+          contract.read.description(),
+          contract.read.startTime(),
+          contract.read.endTime(),
+          contract.read.yesVotes(),
+          contract.read.noVotes(),
+          contract.read.executed(),
+        ]);
 
-    setProposals(validProposals);
-  }, [proposalCount, proposal0.data, proposal1.data]);
+        return {
+          voteContract,
+          title,
+          description,
+          startTime: Number(startTime),
+          endTime: Number(endTime),
+          yesVotes: Number(yesVotes),
+          noVotes: Number(noVotes),
+          executed,
+        };
+      });
+
+      const proposalDetails = await Promise.all(proposalPromises);
+      setProposals(proposalDetails);
+    };
+
+    fetchProposalDetails();
+  }, [allProposals]);
 
   return (
     <div className="flex items-center flex-col flex-grow pt-10">
