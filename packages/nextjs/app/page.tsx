@@ -9,7 +9,6 @@ import { notification } from "~~/utils/scaffold-eth";
 
 // pages/page.tsx
 
-
 interface Proposal {
   voteContract: string;
   title: string;
@@ -22,30 +21,64 @@ interface Proposal {
 }
 
 const ProposalCard = ({ proposal, buildingDAOInfo }: { proposal: Proposal; buildingDAOInfo: any }) => {
-  const { writeContract, isSuccess, isError } = useWriteContract();
-
+  const { writeContract, isSuccess, isError, isPending, error } = useWriteContract();
+  const [isLoading, setIsLoading] = useState(false);
   const handleVote = async (inFavor: boolean) => {
     try {
+      setIsLoading(true);
 
-      console.log(proposal.voteContract);
-      console.log(buildingDAOInfo.abi);
-
-
-      await writeContract({
-        address: proposal.voteContract as `0x${string}`,
-        abi: buildingDAOInfo?.abi,
-        functionName: "sendVote",
-        args: ['true', proposal.voteContract],
+      // Validate parameters
+      console.log("Voting parameters:", {
+        voteContract: proposal.voteContract,
+        inFavor: inFavor,
+        sender: buildingDAOInfo?.address,
       });
+
+      // Pre-execution checks
+      if (!proposal.voteContract) {
+        throw new Error("Vote contract address is missing");
+      }
+
+      console.log("Starting vote transaction...");
+
+      const tx = await writeContract({
+        address: proposal.voteContract as `0x${string}`,
+        abi: [
+          {
+            inputs: [
+              {
+                internalType: "bool",
+                name: "inFavor",
+                type: "bool",
+              },
+            ],
+            name: "vote",
+            outputs: [],
+            stateMutability: "nonpayable",
+            type: "function",
+          },
+        ],
+        functionName: "vote",
+        args: [inFavor],
+      });
+
+      console.log("Transaction submitted:", tx);
 
       if (isSuccess) {
         notification.success("Vote submitted successfully");
       }
       if (isError) {
-        notification.error("Failed to submit vote");
+        console.error("Vote error:", error);
+        notification.error(`Failed to submit vote: ${error?.message || "Unknown error"}`);
       }
-    } catch (error) {
-      notification.error("Error voting");
+    } catch (error: any) {
+      console.error("Vote execution error:", {
+        message: error.message,
+        error: error,
+      });
+      notification.error(`Error voting: ${error.message}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
