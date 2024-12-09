@@ -30,6 +30,7 @@ contract BuildingDAO {
     uint256 public proposalCount;
     uint256 public constant VOTING_DELAY = 1 days;
     uint256 public constant VOTING_PERIOD = 7 days;
+    uint256 private nextTokenId = 1; // Añadir contador de tokens
 
     event ProposalCreated(uint256 indexed proposalId, address voteContract);
     event OwnerAdded(address indexed owner, uint256 tokenId);
@@ -193,11 +194,17 @@ function getProposalDetails(uint256 _proposalId) public view returns (
         return voteToken.balanceOf(_owner);
     }
 
-    function addOwner(address _owner, uint256 _tokenId) public onlyAdmin {
+    function addOwner(address _owner, uint256 /* _tokenId */) public onlyAdmin {
         require(!owners[_owner].isActive, "Ya es propietario");
         owners[_owner].isActive = true;
-        voteToken.mint(_owner, _tokenId);
-        emit OwnerAdded(_owner, _tokenId);
+        voteToken.mint(_owner, nextTokenId);
+        emit OwnerAdded(_owner, nextTokenId);
+        nextTokenId++; // Incrementar el contador
+    }
+
+    // Add function to get next token id
+    function getNextTokenId() public view returns (uint256) {
+        return nextTokenId;
     }
 
     function removeOwner(address _owner) public onlyAdmin {

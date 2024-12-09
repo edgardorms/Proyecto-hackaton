@@ -16,13 +16,20 @@ type HeaderMenuLink = {
 
 export const menuLinks: HeaderMenuLink[] = [
   {
-    label: "Home",
+    label: "Inicio",
     href: "/",
   },
-
   {
-    label: "BuildingDao",
-    href: "/debug",
+    label: "BuildingDAO",
+    href: "/buildingdao",
+  },
+  {
+    label: "Votaciones",
+    href: "/votations",
+  },
+  {
+    label: "ADMIN",
+    href: "/admin",
   },
 ];
 
