@@ -1,80 +1,93 @@
-# 🏗 Scaffold-ETH 2
+# Workflow de Desarrollo de BuildingDAO  
 
-<h4 align="center">
-  <a href="https://docs.scaffoldeth.io">Documentation</a> |
-  <a href="https://scaffoldeth.io">Website</a>
-</h4>
+## 1. Planificación  
+### Actividades Principales  
+- Definición del alcance y los objetivos del proyecto: Crear una plataforma de gobernanza comunitaria basada en blockchain.  
+- Identificación de los requisitos técnicos y funcionales:  
+  - Gestión de propietarios y sus tokens representativos.  
+  - Sistema de votación con reglas claras de quórum y mayorías.  
+  - Interfaz web interactiva y fácil de usar.  
+- Creación de un cronograma para organizar el desarrollo en los tres días disponibles.  
+- Asignación de responsabilidades generales y establecimiento de puntos de revisión diarios.  
 
-🧪 An open-source, up-to-date toolkit for building decentralized applications (dapps) on the Ethereum blockchain. It's designed to make it easier for developers to create and deploy smart contracts and build user interfaces that interact with those contracts.
+### Cronograma  
+- **Día 1**:  
+  - Configuración de herramientas y preparación del entorno de desarrollo.  
+  - Inicio del desarrollo del contrato principal **BuildingDAO**.  
+  - Diseño preliminar de la interfaz y definición de los flujos principales.  
 
-⚙️ Built using NextJS, RainbowKit, Hardhat, Wagmi, Viem, and Typescript.
+- **Día 2**:  
+  - Finalización y prueba de los contratos inteligentes.  
+  - Desarrollo de funcionalidades clave en la interfaz, como la creación y visualización de propuestas.  
+  - Integración inicial entre la interfaz y los contratos inteligentes.  
 
-- ✅ **Contract Hot Reload**: Your frontend auto-adapts to your smart contract as you edit it.
-- 🪝 **[Custom hooks](https://docs.scaffoldeth.io/hooks/)**: Collection of React hooks wrapper around [wagmi](https://wagmi.sh/) to simplify interactions with smart contracts with typescript autocompletion.
-- 🧱 [**Components**](https://docs.scaffoldeth.io/components/): Collection of common web3 components to quickly build your frontend.
-- 🔥 **Burner Wallet & Local Faucet**: Quickly test your application with a burner wallet and local faucet.
-- 🔐 **Integration with Wallet Providers**: Connect to different wallet providers and interact with the Ethereum network.
+- **Día 3**:  
+  - Pruebas exhaustivas del sistema completo.  
+  - Ajustes basados en retroalimentación interna.  
+  - Preparación para el despliegue y presentación.  
 
-![Debug Contracts tab](https://github.com/scaffold-eth/scaffold-eth-2/assets/55535804/b237af0c-5027-4849-a5c1-2e31495cccb1)
-
-## Requirements
-
-Before you begin, you need to install the following tools:
-
-- [Node (>= v18.18)](https://nodejs.org/en/download/)
-- Yarn ([v1](https://classic.yarnpkg.com/en/docs/install/) or [v2+](https://yarnpkg.com/getting-started/install))
-- [Git](https://git-scm.com/downloads)
-
-## Quickstart
-
-To get started with Scaffold-ETH 2, follow the steps below:
-
-1. Install dependencies if it was skipped in CLI:
-
-```
-cd my-dapp-example
-yarn install
-```
-
-2. Run a local network in the first terminal:
-
-```
-yarn chain
-```
-
-This command starts a local Ethereum network using Hardhat. The network runs on your local machine and can be used for testing and development. You can customize the network configuration in `packages/hardhat/hardhat.config.ts`.
-
-3. On a second terminal, deploy the test contract:
-
-```
-yarn deploy
-```
-
-This command deploys a test smart contract to the local network. The contract is located in `packages/hardhat/contracts` and can be modified to suit your needs. The `yarn deploy` command uses the deploy script located in `packages/hardhat/deploy` to deploy the contract to the network. You can also customize the deploy script.
-
-4. On a third terminal, start your NextJS app:
-
-```
-yarn start
-```
-
-Visit your app on: `http://localhost:3000`. You can interact with your smart contract using the `Debug Contracts` page. You can tweak the app config in `packages/nextjs/scaffold.config.ts`.
-
-Run smart contract test with `yarn hardhat:test`
-
-- Edit your smart contracts in `packages/hardhat/contracts`
-- Edit your frontend homepage at `packages/nextjs/app/page.tsx`. For guidance on [routing](https://nextjs.org/docs/app/building-your-application/routing/defining-routes) and configuring [pages/layouts](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts) checkout the Next.js documentation.
-- Edit your deployment scripts in `packages/hardhat/deploy`
+### Recursos Utilizados  
+- **Herramientas**:  
+  - Hardhat para el desarrollo y pruebas de contratos inteligentes.  
+  - Scaffold-eth como plantilla para integrar los contratos con la interfaz.  
+  - Next.js para desarrollar la aplicación web.  
+  - Ethers.js para la interacción con la blockchain.  
+- **Presupuesto**: Uso de recursos gratuitos proporcionados durante la hackaton.  
 
 
-## Documentation
+## 2 Diseño  
+### UI/UX  
+- Creación de wireframes para definir el flujo de usuario:  
+  - Pantalla de inicio con el estado de las propuestas.  
+  - Formularios para crear propuestas y votar.  
+- Diseño de una interfaz intuitiva, con énfasis en claridad para usuarios no técnicos.  
 
-Visit our [docs](https://docs.scaffoldeth.io) to learn how to start building with Scaffold-ETH 2.
+### Revisión de Diseño  
+- Validación interna de los wireframes y prototipos.  
+- Ajustes basados en retroalimentación temprana para optimizar la usabilidad.  
 
-To know more about its features, check out our [website](https://scaffoldeth.io).
+---
 
-## Contributing to Scaffold-ETH 2
+## 3. Desarrollo  
+### Backend (Contratos Inteligentes)  
+- Implementación de **BuildingDAO**, **Vote**, y **VoteToken**:  
+  - **BuildingDAO** gestiona propietarios, propuestas y votos delegados.  
+  - **Vote** regula votaciones específicas, asegurando cumplimiento de quórum y mayorías.  
+  - **VoteToken** implementa tokens ERC721 como representación de unidades habitables.  
 
-We welcome contributions to Scaffold-ETH 2!
+### Frontend  
+- Desarrollo de una interfaz que proporciona  **Next.js**:  
+  - Formularios para la creación de propuestas.  
+  - Tablas y gráficos para mostrar el estado y los resultados de las votaciones.  
 
-Please see [CONTRIBUTING.MD](https://github.com/scaffold-eth/scaffold-eth-2/blob/main/CONTRIBUTING.md) for more information and guidelines for contributing to Scaffold-ETH 2.
+### Integración  
+- Conexión del frontend con los contratos inteligentes usando **ethers.js**.  
+- Validación de datos dinámicos, como el quórum alcanzado y las mayorías necesarias.  
+
+---
+
+##  4 Pruebas  
+### QA Testing  
+- Pruebas unitarias en los contratos inteligentes utilizando Hardhat:  
+  - Validación de las reglas de votación y transferencia de tokens.  
+  - Comprobación de casos límite, como la creación de propuestas inválidas.  
+
+### Pruebas de Usuario  
+- Simulación de flujos completos desde la creación hasta la ejecución de propuestas.  
+- Recolección de retroalimentación para ajustar la experiencia de usuario.  
+
+---
+
+## 5. Despliegue  
+### Lanzamiento  
+- Publicación del sistema en una red de prueba (Goerli).  
+- Verificación del funcionamiento de la interfaz conectada a los contratos.  
+
+### Configuración Final  
+- Resolución de errores finales antes de la presentación.  
+- Validación de la experiencia de usuario en el entorno de producción.  
+
+---
+
+## Resumen  
+BuildingDAO fue desarrollado en **tres días**, logrando un sistema funcional que combina tecnología blockchain con un diseño enfocado en las necesidades de los usuarios. Este proyecto destaca cómo una buena planificación y ejecución en equipo pueden producir resultados innovadores en tiempo récord. 🚀  
