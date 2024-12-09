@@ -19,8 +19,9 @@ const deployBuildingDAO: DeployFunction = async function (hre: HardhatRuntimeEnv
   // Test addresses - using local network addresses
   
   const initialOwners = [
-    
-    "0xdbB3Dbbff646c1F21A6c6e3C1a195021033dad6F",
+    //AGREGAR WALLETS DE TESTEO A INITIAL OWNERS
+
+    "0xdbB3Dbbff646c1F21A6c6e3C1a195021033dad6F", 
     "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
     "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
     "0x0AD49e5E66B949424b25572FC99d94d8bf35f575",
