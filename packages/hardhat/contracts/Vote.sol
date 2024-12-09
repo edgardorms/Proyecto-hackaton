@@ -82,4 +82,27 @@ contract Vote {
             emit ProposalExecuted();
         }
     }
+
+    function getVoteStatistics() external view returns (
+        uint256 _yesVotes,
+        uint256 _noVotes,
+        uint256 _quorum,
+        uint256 _requiredMajority,
+        bool _hasEnded,
+        bool _quorumReached,
+        bool _majorityReached
+    ) {
+        uint256 totalVotes = yesVotes + noVotes;
+        uint256 yesPercentage = totalVotes > 0 ? (yesVotes * 100) / totalVotes : 0;
+        
+        return (
+            yesVotes,
+            noVotes,
+            quorum,
+            requiredMajority,
+            block.timestamp > endTime,
+            totalVotes >= quorum,
+            yesPercentage >= requiredMajority
+        );
+    }
 }

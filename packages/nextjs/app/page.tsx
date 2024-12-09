@@ -9,11 +9,37 @@ import { notification } from "~~/utils/scaffold-eth";
 
 // pages/page.tsx
 
+// pages/page.tsx
+
+// pages/page.tsx
+
+// pages/page.tsx
+
+// pages/page.tsx
+
 const hasAddressVotedAbi = [
   {
     inputs: [{ internalType: "address", name: "_voter", type: "address" }],
     name: "hasAddressVoted",
     outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
+    type: "function",
+  },
+] as const;
+
+const voteStatisticsAbi = [
+  {
+    inputs: [],
+    name: "getVoteStatistics",
+    outputs: [
+      { name: "_yesVotes", type: "uint256" },
+      { name: "_noVotes", type: "uint256" },
+      { name: "_quorum", type: "uint256" },
+      { name: "_requiredMajority", type: "uint256" },
+      { name: "_hasEnded", type: "bool" },
+      { name: "_quorumReached", type: "bool" },
+      { name: "_majorityReached", type: "bool" },
+    ],
     stateMutability: "view",
     type: "function",
   },
@@ -104,21 +130,87 @@ const ProposalCard = ({ proposal, buildingDAOInfo }: { proposal: Proposal; build
     }
   };
 
+  const [timeRemaining, setTimeRemaining] = useState("");
+
+  const { data: voteStats } = useReadContract({
+    address: proposal.voteContract as `0x${string}`,
+    abi: voteStatisticsAbi,
+    functionName: "getVoteStatistics",
+  });
+
+  // Update countdown timer
+  useEffect(() => {
+    const updateTimer = () => {
+      const now = Math.floor(Date.now() / 1000);
+      if (now >= proposal.endTime) {
+        setTimeRemaining("Voting ended");
+        return;
+      }
+
+      const remaining = proposal.endTime - now;
+      const days = Math.floor(remaining / 86400);
+      const hours = Math.floor((remaining % 86400) / 3600);
+      const minutes = Math.floor((remaining % 3600) / 60);
+
+      setTimeRemaining(`${days}d ${hours}h ${minutes}m remaining`);
+    };
+
+    updateTimer();
+    const timer = setInterval(updateTimer, 60000);
+    return () => clearInterval(timer);
+  }, [proposal.endTime]);
+
   return (
-    <div className="bg-base-100 border-base-300 border shadow-md shadow-secondary rounded-3xl px-6 pt-4 pb-4 mb-4">
-      <h3>{proposal.title}</h3>
-      <p>{proposal.description}</p>
-      <p>Total Votes: {totalVotes}</p>
+    <div className="bg-white border border-gray-200 shadow-lg rounded-lg p-6 mb-6 font-sans">
+      <h3 className="text-2xl font-bold mb-2 text-gray-900">{proposal.title}</h3>
+      <p className="text-gray-800 mb-4">{proposal.description}</p>
+      <p className="mb-2 font-semibold text-gray-900">Total Votes: {totalVotes}</p>
       {hasVoted ? (
-        <p>You have already voted.</p>
+        <p className="text-green-600 font-semibold">You have already voted.</p>
       ) : (
         <div className="flex gap-4 mt-4">
-          <button onClick={() => handleVote(true)} disabled={isLoading}>
+          <button onClick={() => handleVote(true)} disabled={isLoading} className="btn btn-success">
             Vote Yes
           </button>
-          <button onClick={() => handleVote(false)} disabled={isLoading}>
+          <button onClick={() => handleVote(false)} disabled={isLoading} className="btn btn-error">
             Vote No
           </button>
+        </div>
+      )}
+      {voteStats && (
+        <div className="mt-6">
+          <p className="mb-2 text-gray-900">
+            Yes Votes: {Number(voteStats[0])} (
+            {totalVotes > 0 ? ((Number(voteStats[0]) * 100) / totalVotes).toFixed(1) : 0}%)
+          </p>
+          <p className="mb-2 text-gray-900">
+            No Votes: {Number(voteStats[1])} (
+            {totalVotes > 0 ? ((Number(voteStats[1]) * 100) / totalVotes).toFixed(1) : 0}%)
+          </p>
+          <p className="mb-2 text-gray-900">
+            Quorum Progress: {totalVotes}/{Number(voteStats[2])} votes needed
+          </p>
+          <p className="mb-4 text-gray-900">Required Majority: {Number(voteStats[3])}%</p>
+          <p className="font-bold text-lg text-center mb-4 text-gray-900">{timeRemaining}</p>
+          <div className="w-full bg-gray-300 rounded-full h-2.5 mb-4">
+            <div
+              className="bg-blue-500 h-2.5 rounded-full"
+              style={{ width: `${(totalVotes / Number(voteStats[2])) * 100}%` }}
+            ></div>
+          </div>
+          {voteStats[4] && (
+            <div className="mt-4 p-4 bg-gray-100 rounded-lg">
+              <p className="text-xl font-semibold text-gray-900">
+                Final Result:{" "}
+                {voteStats[6] ? (
+                  <span className="text-green-600">Proposal Passed</span>
+                ) : (
+                  <span className="text-red-600">Proposal Failed</span>
+                )}
+              </p>
+              {!voteStats[5] && <p className="text-red-600 mt-2">Quorum not reached</p>}
+            </div>
+          )}
         </div>
       )}
     </div>
