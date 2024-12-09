@@ -2,12 +2,22 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useReadContract, useWriteContract } from "wagmi";
+import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import { Address } from "~~/components/scaffold-eth";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 import { notification } from "~~/utils/scaffold-eth";
 
 // pages/page.tsx
+
+const hasAddressVotedAbi = [
+  {
+    inputs: [{ internalType: "address", name: "_voter", type: "address" }],
+    name: "hasAddressVoted",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
+    type: "function",
+  },
+] as const;
 
 interface Proposal {
   voteContract: string;
@@ -21,6 +31,18 @@ interface Proposal {
 }
 
 const ProposalCard = ({ proposal, buildingDAOInfo }: { proposal: Proposal; buildingDAOInfo: any }) => {
+  // Update to use the same pattern as other contract reads
+  const { address } = useAccount();
+  const { data: hasVoted } = useReadContract({
+    address: proposal.voteContract as `0x${string}`,
+    abi: hasAddressVotedAbi,
+    functionName: "hasAddressVoted",
+    args: [address as `0x${string}`],
+  });
+  console.log(hasVoted);
+
+  const totalVotes = proposal.yesVotes + proposal.noVotes;
+
   const { writeContract, isSuccess, isError, isPending, error } = useWriteContract();
   const [isLoading, setIsLoading] = useState(false);
   const handleVote = async (inFavor: boolean) => {
@@ -86,10 +108,19 @@ const ProposalCard = ({ proposal, buildingDAOInfo }: { proposal: Proposal; build
     <div className="bg-base-100 border-base-300 border shadow-md shadow-secondary rounded-3xl px-6 pt-4 pb-4 mb-4">
       <h3>{proposal.title}</h3>
       <p>{proposal.description}</p>
-      <div className="flex gap-4 mt-4">
-        <button onClick={() => handleVote(true)}>Vote Yes</button>
-        <button onClick={() => handleVote(false)}>Vote No</button>
-      </div>
+      <p>Total Votes: {totalVotes}</p>
+      {hasVoted ? (
+        <p>You have already voted.</p>
+      ) : (
+        <div className="flex gap-4 mt-4">
+          <button onClick={() => handleVote(true)} disabled={isLoading}>
+            Vote Yes
+          </button>
+          <button onClick={() => handleVote(false)} disabled={isLoading}>
+            Vote No
+          </button>
+        </div>
+      )}
     </div>
   );
 };

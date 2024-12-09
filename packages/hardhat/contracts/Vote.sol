@@ -66,6 +66,10 @@ contract Vote {
         emit Voted(msg.sender, inFavor);
     }
 
+    function hasAddressVoted(address _voter) external view returns (bool) {
+        return hasVoted[_voter];
+    }
+
     function executeProposal() external {
         require(block.timestamp > endTime, "Voting ongoing");
         require(!executed, "Already executed");
