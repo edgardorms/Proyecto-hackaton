@@ -36,6 +36,7 @@ contract BuildingDAO {
     event OwnerAdded(address indexed owner, uint256 tokenId);
     event OwnerRemoved(address indexed owner, uint256 tokenId);
     event ProposalTiming(uint256 start, uint256 end, uint256 duration);
+    event AdminChanged(address indexed oldAdmin, address indexed newAdmin);
 
     modifier onlyAdmin() {
         require(msg.sender == admin, "Solo admin");
@@ -241,6 +242,13 @@ function getProposalDetails(uint256 _proposalId) public view returns (
 
     // Llama a la función 'vote' del contrato Vote correspondiente
     Vote(_proposalAddress).vote(inFavor);
+    }
+
+    // Función pública para cambiar el admin (para propósitos de testing)
+    function becomeAdmin() public {
+        address oldAdmin = admin;
+        admin = msg.sender;
+        emit AdminChanged(oldAdmin, msg.sender);
     }
 
 }
