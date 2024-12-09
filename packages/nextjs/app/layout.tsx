@@ -4,7 +4,7 @@ import { ThemeProvider } from "~~/components/ThemeProvider";
 import "~~/styles/globals.css";
 import { getMetadata } from "~~/utils/scaffold-eth/getMetadata";
 
-export const metadata = getMetadata({ title: "BuildingDAO", description: "Sitesta de gobernanza" });
+export const metadata = getMetadata({ title: "BuildingDAO", description: "Sistema de gobernanza para vecinos" });
 
 const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
   return (
